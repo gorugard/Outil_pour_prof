@@ -1,0 +1,154 @@
+# Import des modules nécessaires
+from csv import DictWriter  # Pour écrire dans un fichier CSV
+
+# Affichage du titre ASCII
+print(r"""
+   _____           _____ _____        _____  _____   
+  / ____|   /\    / ____|  __ \ /\   |  __ \|  __ \  
+ | |  __   /  \  | (___ | |__) /  \  | |__) | |  | | 
+ | | |_ | / /\ \  \___ \|  ___/ /\ \ |  _  /| |  | | 
+ | |__| |/ ____ \ ____) | |  / ____ \| | \ \| |__| | 
+  \_____/_/    \_\_____/|_| /_/    \_\_|  \_\_____/  
+""")
+
+"""
+Bonjour et bienvenue dans ce programme interactif qui vous permet de créer un tableau à entête colonne. 
+Il contiendra les notes de chaque élève triées par évaluation.
+Source du projet :
+http://yalamaths.free.fr/documents/NSI/TP-Projets/1ereNSI_TP_Des-criteres-aux-entites.pdf
+
+L'utilisation de ce programme est relativement simple. Si vous souhaitez l'améliorer ou comprendre le code, 
+vous pouvez consulter les ressources suivantes :
+https://docs.python.org/fr/3/library/csv.html (documentation sur la librairie CSV)
+https://fr.python-3.com/?p=2607  (pour mieux comprendre les tableaux)
+https://waytolearnx.com/2020/07/python-la-methode-string-strip.html (méthode .strip)
+
+
+
+Encore une fois un grand merci à :
+http://yalamaths.free.fr/
+
+"""
+
+
+# Fonction pour demander une entrée et confirmer la saisie
+def demander_et_confirmer(message, type_conversion=int):
+    while True:
+        try:
+            valeur = type_conversion(input(message))  # Convertit l'entrée utilisateur selon le type spécifié
+            print("\n" * 2)
+            confirmation = input(f"Vous avez entré : {valeur}\nConfirmez-vous ? (1 = Oui, 2 = Non) : ")
+            print("\n" * 2)
+            if confirmation == "1":
+                return valeur  # Retourne la valeur si confirmée
+            elif confirmation == "2":
+                print("Recommençons la saisie.")
+                print("\n" * 2)
+        except ValueError:  # Gestion des erreurs de saisie
+            print("Erreur : Veuillez entrer une valeur valide.")
+            print("\n" * 2)
+
+
+# Fonction pour entrer une liste de critères
+def entrer_liste_critères(nb_critères: int) -> list[str]:
+    critères = []
+    for num_critère in range(nb_critères):
+        while True:
+            critère = input(f"Entrez le critère {num_critère + 1} : ").strip()
+            print("\n" * 2)
+            confirmation = input(f"Vous avez saisi : '{critère}'\nConfirmez-vous ? (1 = Oui, 2 = Non) : ")
+            print("\n" * 2)
+            if confirmation == "1" and critère and critère not in critères:
+                critères.append(critère)
+                break
+            elif confirmation == "2":
+                print("Recommençons la saisie du critère.")
+                print("\n" * 2)
+            else:
+                print("Erreur : critère invalide ou déjà existant.")
+                print("\n" * 2)
+    return critères
+
+
+# Fonction pour entrer les notes par critère et par élève
+def entrer_matrice_par_critère(critères: list[str], nb_élèves: int) -> list[list[float]]:
+    matrice = []  # Contiendra les listes de valeurs pour chaque critère
+    
+    for critère in critères:
+        valeurs: list[float] = []  # Liste pour stocker les notes du critère actuel
+        for num_élève in range(nb_élèves):
+            valeur = demander_et_confirmer(f"Entrez la note pour '{critère}' (Élève {num_élève + 1}) : ", float)
+            valeurs.append(valeur)  # Ajout de la note
+        matrice.append(valeurs)  # Ajout de la liste des notes pour ce critère
+
+    return matrice
+
+
+# Fonction pour transposer une matrice (lignes / colonnes)
+def transposer_matrice(matrice: list[list[float]]) -> list[list[float]]:
+    return [[matrice[j][i] for j in range(len(matrice))] for i in range(len(matrice[0]))]
+
+
+# Fonction pour créer une base de données sous forme de liste de dictionnaires
+def créer_BDD(critères: list[str], matrice_par_entité: list[list[float]]) -> list[dict[str, float]]:
+    return [{critères[j]: matrice_par_entité[i][j] for j in range(len(critères))} for i in range(len(matrice_par_entité))]
+
+
+# Fonction pour sauvegarder la base de données dans un fichier CSV
+def sauvegarder_csv(table: list[dict[str, float]], nom_fichier="BDD.csv"):
+    """Sauvegarde une table (liste de dictionnaires) dans un fichier CSV."""
+    if not table:
+        print("Erreur : La base de données est vide, aucun fichier CSV ne sera créé.")
+        return
+    
+    with open(nom_fichier, mode='w', encoding='utf-8', newline='') as fichier_ouvert:
+        fichier_en_ecriture = DictWriter(fichier_ouvert, fieldnames=table[0].keys(), delimiter=',')
+        fichier_en_ecriture.writeheader()  # Écrit les en-têtes
+        fichier_en_ecriture.writerows(table)  # Écrit toutes les lignes
+    
+    print(f"Données sauvegardées dans {nom_fichier}.")
+
+
+# Programme principal
+def main():
+    print("=== Bienvenue dans le gestionnaire de notes ===")
+    print("\n" * 2)
+
+    # Demande du nombre d'évaluations
+    while True:
+        nb_evaluation = demander_et_confirmer("Entrez le nombre d'évaluations : ", int)
+        if nb_evaluation > 0:
+            break
+        print("Erreur : Veuillez entrer un nombre d'évaluations valide (supérieur à 0).")
+        print("\n" * 3)
+
+    # Saisie des critères (noms des évaluations)
+    critères = entrer_liste_critères(nb_evaluation)
+
+    # Demande du nombre d'élèves
+    while True:
+        nb_élèves = demander_et_confirmer("Entrez le nombre d’élèves : ", int)
+        if nb_élèves > 0:
+            break
+        print("Erreur : Veuillez entrer un nombre d’élèves valide (supérieur à 0).")
+        print("\n" * 2)
+
+    # Création de la matrice des notes
+    matrice_notes = entrer_matrice_par_critère(critères, nb_élèves)
+
+    # Transposition pour obtenir une matrice organisée par élève
+    matrice_élèves = transposer_matrice(matrice_notes)
+
+    # Création de la base de données
+    bdd = créer_BDD(critères, matrice_élèves)
+
+    # Sauvegarde des données au format CSV
+    sauvegarder_csv(bdd)
+
+    print("Merci d'avoir utilisé ce programme. À très bientôt !")
+
+
+# Exécution du programme
+if __name__ == "__main__":
+    main()
+
