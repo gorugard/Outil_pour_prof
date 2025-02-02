@@ -38,7 +38,7 @@ def demander_et_confirmer(message, type_conversion=int):
         try:
             valeur = type_conversion(input(message))  # Convertit l'entrée utilisateur selon le type spécifié
             print("\n" * 2)
-            confirmation = input(f"Vous avez entré : {valeur}\nConfirmez-vous ? (1 = Oui, 2 = Non) : ")
+            confirmation = input(f"Vous avez entré : {valeur}\nConfirmez-vous ? Entrez 1 pour oui ou 2 pour modifiez : ")
             print("\n" * 2)
             if confirmation == "1":
                 return valeur  # Retourne la valeur si confirmée
@@ -57,7 +57,7 @@ def entrer_liste_critères(nb_critères: int) -> list[str]:
         while True:
             critère = input(f"Entrez le critère {num_critère + 1} : ").strip()
             print("\n" * 2)
-            confirmation = input(f"Vous avez saisi : '{critère}'\nConfirmez-vous ? (1 = Oui, 2 = Non) : ")
+            confirmation = input(f"Vous avez saisi : '{critère}'\nConfirmez-vous ? Entrez 1 pour oui ou 2 pour modifiez : ")
             print("\n" * 2)
             if confirmation == "1" and critère and critère not in critères:
                 critères.append(critère)
@@ -99,7 +99,7 @@ def créer_BDD(critères: list[str], matrice_par_entité: list[list[float]]) -> 
 def sauvegarder_csv(table: list[dict[str, float]], nom_fichier="BDD.csv"):
     """Sauvegarde une table (liste de dictionnaires) dans un fichier CSV."""
     if not table:
-        print("Erreur : La base de données est vide, aucun fichier CSV ne sera créé.")
+        print("Erreur : La base de données est vide, aucun fichier CSV ne sera pas créé.")
         return
     
     with open(nom_fichier, mode='w', encoding='utf-8', newline='') as fichier_ouvert:
@@ -107,7 +107,7 @@ def sauvegarder_csv(table: list[dict[str, float]], nom_fichier="BDD.csv"):
         fichier_en_ecriture.writeheader()  # Écrit les en-têtes
         fichier_en_ecriture.writerows(table)  # Écrit toutes les lignes
     
-    print(f"Données sauvegardées dans {nom_fichier}.")
+    print(f"Données sauvegardées dans {nom_fichier} (accessible depuis votre bureau).")
 
 
 # Programme principal
