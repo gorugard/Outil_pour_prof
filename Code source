@@ -27,6 +27,7 @@ https://waytolearnx.com/2020/07/python-la-methode-string-strip.html (méthode .s
 
 Encore une fois un grand merci à :
 http://yalamaths.free.fr/
+seykamoonlight sur Discord
 
 """
 
@@ -111,7 +112,7 @@ def sauvegarder_csv(table: list[dict[str, float]], nom_fichier="BDD.csv"):
 
 # Programme principal
 def main():
-    print("=== Bienvenue dans le gestionnaire de notes ===")
+    print("    -Bienvenue dans votre gestionnaire de notes-    ")
     print("\n" * 2)
 
     # Demande du nombre d'évaluations
